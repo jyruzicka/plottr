@@ -105,4 +105,10 @@ Here we first initialise a table with three columns. Each column must be marked 
 
 ### Plot
 
-The ``Plottr::Plot` is the foundation of your plot. 
+The `Plottr::Plot` is the foundation of your plot. You can set a number of things on your plot, including the title and margins:
+
+```ruby
+p = Plottr::Plot.new(t)
+p.margin = { top: 50, bottom: 50, left: 55, right: 10 }
+p.title = "Title of the graph"
+```
