@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jyruzicka/plottr.svg?branch=master)](https://travis-ci.org/jyruzicka/plottr)
+
 # plottr
 
 Plottr will one day be a ruby library that enables you to turn **raw data** into **beautiful plots**. It's based heavily on R's [ggplot](), with help from [gnuplot]() and [d3]().
