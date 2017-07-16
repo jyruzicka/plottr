@@ -2,23 +2,9 @@
 
 # plottr
 
-Plottr will one day be a ruby library that enables you to turn **raw data** into **beautiful plots**. It's based heavily on R's [ggplot](), with help from [gnuplot]() and [d3]().
+Plottr will one day be a ruby library that enables you to turn **raw data** into **beautiful plots**. It's based heavily on R's [ggplot2](http://ggplot2.org/), with help from [gnuplot](http://gnuplot.info/) and [d3](https://d3js.org/). Plottr's data filtering and modification is based on R's [dplyr](https://github.com/hadley/dplyr).
 
-Plottr is still in the early stages of development. Watch this space as I continue to add features!
-
-## Installation
-
-Install via rubygems:
-
-```
-gem install plottr
-```
-
-Require in your application:
-
-```ruby
-require "plottr"
-```
+Plottr is abandoned. Feel free to strip its corpse for useful code.
 
 ## Making plots
 

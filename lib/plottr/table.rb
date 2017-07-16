@@ -1,7 +1,11 @@
 # The Table object stores a set of Rows. It also ensures that each Row conforms to the Table's general
 # layout (i.e. does not introduce any new columns, existing columns are the right sort).
 
+Plottr::InvalidRowKeyError = Class.new(Exception)
+
 class Plottr::Table
+  
+
   # A list of columns and their types
   attr_accessor :columns
 
@@ -73,7 +77,74 @@ class Plottr::Table
 
   # Collect a "vector" or column - an array of values taken from each row
   def vector(column_name)
-    raise ArgumentError, "Column named #{column_name.inspect} doesn't exist." unless column(column_name)
-    rows.map{ |r| r[column_name] }
+    rows.map do |row|
+      raise(Plottr::InvalidRowKeyError, "Unrecognised row key #{column_name}") if !row.has_key?(column_name)
+      row[column_name]
+    end
+  end
+
+  #-------------------------------------------------------------------------------
+  # Table modifying methods
+
+  # Return a table with the same columns, but whose rows have been filtered according to either
+  # the supplied hash, or a supplied block
+  def filter(hsh=nil, &blck)
+    raise(ArgumentError, "Table#filter requires exactly one argument, 0 supplied.") if hsh.nil? && blck.nil?
+    raise(ArgumentError, "Table#filter requires exactly one argument, 2 supplied.") if hsh && blck
+    new_rows = if hsh
+      self.rows.select do |row|
+        hsh.all? do |k,v|
+          raise(Plottr::InvalidRowKeyError, "Unrecognised row key #{k}") if !row.has_key?(k)
+          row[k] == v
+        end
+      end
+    else
+      self.rows.select{ |row| blck[row] }
+    end
+
+    new_table = Plottr::Table.new(self.columns)
+    new_table.rows = new_rows
+    new_table
+  end
+
+  # Return a table with sorted rows, according to supplied keys
+  def sort(*keys)
+    sort_directions = {}
+    asc_regexp = /(.*)_asc$/
+    desc_regexp = /(.*)_desc$/
+    keys.each_with_index do |key,key_index|
+      key_as_string = key.to_s
+      if m = asc_regexp.match(key_as_string)
+        new_key = m[1].to_sym
+        keys[key_index] = new_key
+        sort_directions[new_key] = :asc
+      elsif m = desc_regexp.match(key_as_string)
+        new_key = m[1].to_sym
+        keys[key_index] = new_key
+        sort_directions[new_key] = :desc
+      else
+        sort_directions[key] = :asc
+      end
+    end
+
+    key_size = keys.size
+    new_rows = rows.sort do |x,y|
+      compare = 0
+      idx = 0
+      while compare == 0 && idx < key_size
+        key = keys[idx]
+        raise(Plottr::InvalidRowKeyError, "Unrecognised row key #{key}") if !x.has_key?(key) || !y.has_key?(key)
+        compare = if sort_directions[key] == :asc
+          (x[key] <=> y[key])
+        else
+          (y[key] <=> x[key])
+        end
+        idx += 1
+      end
+      compare
+    end
+    new_table = Plottr::Table.new(self.columns)
+    new_table.rows = new_rows
+    new_table
   end
 end
